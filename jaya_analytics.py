@@ -48,9 +48,9 @@ def write_excel_file(folder_name, filename, data):
 def write_json_file(folder_name, filename, data):
     file_path = Path(folder_name, filename)
     file_path.parent.mkdir(parents=True, exist_ok=True)
-    with file_path.open('w') as file:
-        json.dump(data, file, indent=4)
-        print(f"JSON data saved to {file_path}")
+    with file_path.open('wb') as file:
+        file.write(data)
+        print(f"Binary data saved to {file_path}")
 
 #Function - Fetch and write excel file
 def fetch_and_write_excel_data(folder_name, filename, url):
@@ -79,12 +79,11 @@ def fetch_and_write_csv_data(folder_name, filename, url):
 
 #Function - Fetch and save JSON data
 def fetch_and_write_json_data(folder_name, filename, url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        write_json_file(folder_name, filename, response.json())
-    except requests.RequestException as e:
-        print(f"Error fetching JSON data: {e}")
+    response = requests.get(url)
+    if response.status_code == 200:
+        write_json_file(folder_name, filename, response.content)
+    else:
+        print(f"Failed to fetch json data:{response.status_code}")
 
 # Function - Process text data  
 def process_txt_file(folder_name, input_filename, output_filename):
